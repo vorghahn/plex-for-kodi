@@ -225,6 +225,29 @@ msgctxt "#32057"
 msgid "Current Server Version"
 msgstr ""
 
+msgctxt "#32059"
+msgid "Channels"
+msgstr ""
+
+msgctxt "#32060"
+msgid "Live TV"
+msgstr ""
+
+msgctxt "#32061"
+msgid "Live TV Setup"
+msgstr ""
+
+msgctxt "#32062"
+msgid "Username"
+msgstr ""
+
+msgctxt "#32063"
+msgid "Password"
+msgstr ""
+
+msgctxt "#32064"
+msgid "Enable TVHeadend"
+msgstr ""
 
 msgctxt "#32100"
 msgid "Skip user selection and pin entry on startup."

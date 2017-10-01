@@ -1,7 +1,6 @@
 import time
 import threading
 import re
-
 import xbmc
 import xbmcgui
 
@@ -160,12 +159,16 @@ class ServerListItem(kodigui.ManagedListItem):
 
 
 class HomeWindow(kodigui.BaseWindow, util.CronReceiver):
-    xmlFile = 'script-plex-home.xml'
+    if plexapp.INTERFACE.getPreference("live_tv", True):
+        xmlFile = 'script-plex-home-live.xml'
+    else:
+        xmlFile = 'script-plex-home.xml'
     path = util.ADDON.getAddonInfo('path')
     theme = 'Main'
     res = '1080i'
     width = 1920
     height = 1080
+    ptype = ''
 
     OPTIONS_GROUP_ID = 200
 
@@ -174,6 +177,9 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver):
 
     USER_BUTTON_ID = 202
     USER_LIST_ID = 250
+
+    LIVE_BUTTON_ID = 205
+    LIVE_LIST_ID = 220
 
     SEARCH_BUTTON_ID = 203
     SERVER_LIST_ID = 260
@@ -288,6 +294,7 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver):
         self.sectionList = kodigui.ManagedControlList(self, self.SECTION_LIST_ID, 7)
         self.serverList = kodigui.ManagedControlList(self, self.SERVER_LIST_ID, 10)
         self.userList = kodigui.ManagedControlList(self, self.USER_LIST_ID, 3)
+        self.liveList = kodigui.ManagedControlList(self, self.LIVE_LIST_ID, 10)
 
         self.hubControls = (
             kodigui.ManagedControlList(self, self.HUB_AR16X9_00, 5),
@@ -374,6 +381,7 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver):
                 self.checkSectionItem(action=action)
 
             if controlID == self.SERVER_BUTTON_ID:
+
                 if action == xbmcgui.ACTION_SELECT_ITEM:
                     self.showServers()
                     return
@@ -389,10 +397,23 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver):
                     self.showUserMenu(mouse=True)
                     self.setBoolProperty('show.options', True)
                     return
+            elif controlID == self.LIVE_BUTTON_ID:
+                if action == xbmcgui.ACTION_SELECT_ITEM:
+                    self.showLiveTV()
+                    # self.setBoolProperty('show.live', True)
+                    return
+                elif action == xbmcgui.ACTION_MOUSE_LEFT_CLICK:
+                    self.showLiveTV(mouse=True)
+                    self.setBoolProperty('show.live', True)
+                    return
 
             if controlID == self.SERVER_BUTTON_ID and action == xbmcgui.ACTION_MOVE_RIGHT:
                 self.setFocusId(self.USER_BUTTON_ID)
+            elif controlID == self.SERVER_BUTTON_ID and action == xbmcgui.ACTION_MOVE_LEFT:
+                    self.setFocusId(self.LIVE_BUTTON_ID)
             elif controlID == self.USER_BUTTON_ID and action == xbmcgui.ACTION_MOVE_LEFT:
+                self.setFocusId(self.SERVER_BUTTON_ID)
+            elif controlID == self.LIVE_BUTTON_ID and action == xbmcgui.ACTION_MOVE_RIGHT:
                 self.setFocusId(self.SERVER_BUTTON_ID)
             elif controlID == self.SEARCH_BUTTON_ID and action == xbmcgui.ACTION_MOVE_RIGHT:
                 if xbmc.getCondVisibility('Player.HasMedia + Control.IsVisible({0})'.format(self.PLAYER_STATUS_BUTTON_ID)):
@@ -412,6 +433,9 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver):
             if action in(xbmcgui.ACTION_NAV_BACK, xbmcgui.ACTION_PREVIOUS_MENU):
                 if self.getFocusId() == self.USER_LIST_ID:
                     self.setFocusId(self.USER_BUTTON_ID)
+                    return
+                elif self.getFocusId() == self.LIVE_LIST_ID:
+                    self.setFocusId(self.LIVE_BUTTON_ID)
                     return
                 elif self.getFocusId() == self.SERVER_LIST_ID:
                     self.setFocusId(self.SERVER_BUTTON_ID)
@@ -444,6 +468,14 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver):
             self.hubItemClicked(controlID)
         elif controlID == self.SEARCH_BUTTON_ID:
             self.searchButtonClicked()
+        elif controlID == self.LIVE_LIST_ID:
+            self.selectLiveTV()
+            self.setBoolProperty('show.live', False)
+            self.setFocusId(self.LIVE_BUTTON_ID)
+            # import livetvmenu
+            #livetvmenu.callM3u8()
+            # livetvmenu.openWindow()
+
 
     def onFocus(self, controlID):
         self.lastFocusID = controlID
@@ -657,9 +689,16 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver):
             backgroundthread.BGThreader.addTasks(self.tasks)
 
         for section in sections:
+            if 0 == 1:#len(items) == 1 and plexapp.INTERFACE.getPreference("live_tv", True):
+                liveli = kodigui.ManagedListItem(T(32061, 'Live TV'), thumbnailImage='script.plex/home/type/playlists.png', data_source=section)
+                liveli.setProperty('item', '1')
+                items.append(liveli)
+                util.DEBUG_LOG('data source is: {0}'.format(type(section)))
             mli = kodigui.ManagedListItem(section.title, thumbnailImage='script.plex/home/type/{0}.png'.format(section.type), data_source=section)
             mli.setProperty('item', '1')
             items.append(mli)
+
+
 
         self.bottomItem = len(items) - 1
 
@@ -731,13 +770,13 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver):
                     util.DEBUG_LOG('UNHANDLED - Hub: {0} ({1})'.format(hub.hubIdentifier, len(hub.items)))
                     continue
 
-                skip[self.HUBMAP[identifier]['index']] = 1
+                skip[self.HUBMAP[identifier ]['index']] = 1
 
                 if self.showHub(hub):
                     if hub.items:
                         hasContent = True
-                    if self.HUBMAP[identifier].get('do_updates'):
-                        self.updateHubs[identifier] = hub
+                    if self.HUBMAP[identifier ].get('do_updates'):
+                        self.updateHubs[identifier ] = hub
 
             if not hasContent:
                 self.setBoolProperty('no.content', True)
@@ -745,7 +784,6 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver):
             lastSkip = 0
             if skip:
                 lastSkip = min(skip.keys())
-
             focus = None
             if update:
                 for i, control in enumerate(self.hubControls):
@@ -1051,6 +1089,45 @@ class HomeWindow(kodigui.BaseWindow, util.CronReceiver):
             return
 
         plexapp.SERVERMANAGER.setSelectedServer(server, force=True)
+
+    def showLiveTV(self, mouse=False):
+        items = []
+        items.append(kodigui.ManagedListItem('TVHeadend', data_source='tvh'))
+        items.append(kodigui.ManagedListItem('m3u8', data_source='m3u8'))
+        items.append(kodigui.ManagedListItem('SmoothStreams', data_source='sstv'))
+
+        if len(items) > 1:
+            items[0].setProperty('first', '1')
+            items[-1].setProperty('last', '1')
+        else:
+            items[0].setProperty('only', '1')
+
+        self.liveList.reset()
+        self.liveList.addItems(items)
+
+        self.getControl(801).setHeight((len(items) * 66) + 80)
+
+        if not mouse:
+            self.setFocusId(self.LIVE_LIST_ID)
+
+    def selectLiveTV(self):
+        mli = self.liveList.getSelectedItem()
+        if not mli:
+            return
+        option = mli.dataSource
+        self.setFocusId(self.LIVE_BUTTON_ID)
+        import livetvmenu
+        livetvmenu.settype(option)
+        if option == 'tvh':
+            livetvmenu.openWindow()
+        elif option == 'm3u8':
+            livetvmenu.openWindow()
+        elif option == 'sstv':
+            livetvmenu.openWindow()
+        else:
+            self.closeOption = option
+            self.doClose()
+
 
     def showUserMenu(self, mouse=False):
         items = []

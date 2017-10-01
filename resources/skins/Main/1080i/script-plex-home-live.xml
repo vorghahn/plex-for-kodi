@@ -7945,6 +7945,190 @@
                     <scrolltime tween="quadratic" easing="out">200</scrolltime>
                     <usecontrolcoords>true</usecontrolcoords>
 
+                    <control type="button" id="205">
+                        <width max="500">auto</width>
+                        <height>66</height>
+                        <font>font12</font>
+                        <textcolor>FFFFFFFF</textcolor>
+                        <focusedcolor>FF000000</focusedcolor>
+                        <disabledcolor>FFFFFFFF</disabledcolor>
+                        <align>right</align>
+                        <aligny>center</aligny>
+                        <texturefocus colordiffuse="FFE5A00D" border="10">script.plex/white-square-rounded.png</texturefocus>
+                        <texturenofocus>-</texturenofocus>
+                        <textoffsetx>100</textoffsetx>
+                        <textoffsety>0</textoffsety>
+                        <label>Live TV</label>
+                        <onunfocus condition="!IsEmpty(Window.Property(show.live))">SetFocus(220)</onunfocus>
+                    </control>
+                    <control type="group">
+                        <posx>-87</posx>
+                        <width>87</width>
+                        <height>66</height>
+                        <!--<control type="image">-->
+                            <!--<posx>0</posx>-->
+                            <!--<posy>14</posy>-->
+                            <!--<width>40</width>-->
+                            <!--<height>39</height>-->
+                            <!--<texture diffuse="script.plex/home/avatar-diffuse.png" fallback="script.plex/gray-square.png">$INFO[Window.Property(user.avatar)]</texture>-->
+                        <!--</control>-->
+                        <!--<control type="label">-->
+                            <!--<visible>IsEmpty(Window.Property(user.avatar))</visible>-->
+                            <!--<posx>0</posx>-->
+                            <!--<posy>14</posy>-->
+                            <!--<width>40</width>-->
+                            <!--<height>39</height>-->
+                            <!--<font>font10</font>-->
+                            <!--<align>center</align>-->
+                            <!--<aligny>center</aligny>-->
+                            <!--<textcolor>FFFFFFFF</textcolor>-->
+                            <!--<label>[B]$INFO[Window.Property(user.avatar.letter)][/B]</label>-->
+                        <!--</control>-->
+                        <control type="image">
+                            <visible>!Control.HasFocus(205)</visible>
+                            <posx>53</posx>
+                            <posy>27</posy>
+                            <width>15</width>
+                            <height>13</height>
+                            <texture>script.plex/indicators/dropdown-triangle.png</texture>
+                            <colordiffuse>99FFFFFF</colordiffuse>
+                        </control>
+                        <control type="image">
+                            <visible>Control.HasFocus(205)</visible>
+                            <posx>53</posx>
+                            <posy>27</posy>
+                            <width>15</width>
+                            <height>13</height>
+                            <texture>script.plex/indicators/dropdown-triangle.png</texture>
+                            <colordiffuse>FF222222</colordiffuse>
+                        </control>
+                        <control type="group">
+                            <visible>Control.HasFocus(220) | !IsEmpty(Window.Property(show.live))</visible>
+                            <posx>-213</posx>
+                            <posy>70</posy>
+                            <control type="image" id="801">
+                                <posx>-40</posx>
+                                <posy>-40</posy>
+                                <width>380</width>
+                                <height>146</height>
+                                <texture border="42">script.plex/drop-shadow.png</texture>
+                            </control>
+                            <control type="image">
+                                <posx>226</posx>
+                                <posy>-13</posy>
+                                <width>15</width>
+                                <height>13</height>
+                                <texture flipy="true">script.plex/indicators/dropdown-triangle.png</texture>
+                                <colordiffuse>FF1F1F1F</colordiffuse>
+                            </control>
+                            <control type="list" id="220">
+                                <hitrect x="0" y="-10" w="300" h="208" />
+                                <posx>0</posx>
+                                <posy>0</posy>
+                                <width>300</width>
+                                <height>198</height>
+                                <onup>202</onup>
+                                <ondown>noop</ondown>
+                                <onleft>201</onleft>
+                                <onright>203</onright>
+                                <onunfocus>SetProperty(show.live,)</onunfocus>
+                                <scrolltime>200</scrolltime>
+                                <orientation>vertical</orientation>
+                                <!-- ITEM LAYOUT ########################################## -->
+                                <itemlayout height="66">
+                                    <control type="image">
+                                        <visible>!IsEmpty(ListItem.Property(first))</visible>
+                                        <posx>0</posx>
+                                        <posy>0</posy>
+                                        <width>300</width>
+                                        <height>66</height>
+                                        <texture colordiffuse="FF1F1F1F" border="10">script.plex/white-square-top-rounded.png</texture>
+                                    </control>
+                                    <control type="image">
+                                        <visible>IsEmpty(ListItem.Property(first)) + IsEmpty(ListItem.Property(last)) + IsEmpty(ListItem.Property(only))</visible>
+                                        <posx>0</posx>
+                                        <posy>0</posy>
+                                        <width>300</width>
+                                        <height>66</height>
+                                        <texture colordiffuse="FF1F1F1F">script.plex/white-square.png</texture>
+                                    </control>
+                                    <control type="image">
+                                        <visible>!IsEmpty(ListItem.Property(last))</visible>
+                                        <posx>0</posx>
+                                        <posy>0</posy>
+                                        <width>300</width>
+                                        <height>66</height>
+                                        <texture flipy="true" colordiffuse="FF1F1F1F" border="10">script.plex/white-square-top-rounded.png</texture>
+                                    </control>
+                                    <control type="image">
+                                        <visible>!IsEmpty(ListItem.Property(only))</visible>
+                                        <posx>0</posx>
+                                        <posy>0</posy>
+                                        <width>300</width>
+                                        <height>66</height>
+                                        <texture colordiffuse="FF1F1F1F" border="10">script.plex/white-square-rounded.png</texture>
+                                    </control>
+                                    <control type="label">
+                                        <posx>0</posx>
+                                        <posy>0</posy>
+                                        <width>300</width>
+                                        <height>66</height>
+                                        <font>font12</font>
+                                        <align>center</align>
+                                        <aligny>center</aligny>
+                                        <textcolor>FFFFFFFF</textcolor>
+                                        <label>$INFO[ListItem.Label]</label>
+                                    </control>
+                                </itemlayout>
+                                <focusedlayout height="66">
+                                    <control type="image">
+                                        <visible>!IsEmpty(ListItem.Property(first))</visible>
+                                        <posx>0</posx>
+                                        <posy>0</posy>
+                                        <width>300</width>
+                                        <height>66</height>
+                                        <texture colordiffuse="FFE5A00D" border="10">script.plex/white-square-top-rounded.png</texture>
+                                    </control>
+                                    <control type="image">
+                                        <visible>IsEmpty(ListItem.Property(first)) + IsEmpty(ListItem.Property(last)) + IsEmpty(ListItem.Property(only))</visible>
+                                        <posx>0</posx>
+                                        <posy>0</posy>
+                                        <width>300</width>
+                                        <height>66</height>
+                                        <texture colordiffuse="FFE5A00D">script.plex/white-square.png</texture>
+                                    </control>
+                                    <control type="image">
+                                        <visible>!IsEmpty(ListItem.Property(last))</visible>
+                                        <posx>0</posx>
+                                        <posy>0</posy>
+                                        <width>300</width>
+                                        <height>66</height>
+                                        <texture flipy="true" colordiffuse="FFE5A00D" border="10">script.plex/white-square-top-rounded.png</texture>
+                                    </control>
+                                    <control type="image">
+                                        <visible>!IsEmpty(ListItem.Property(only))</visible>
+                                        <posx>0</posx>
+                                        <posy>0</posy>
+                                        <width>300</width>
+                                        <height>66</height>
+                                        <texture colordiffuse="FFE5A00D" border="10">script.plex/white-square-rounded.png</texture>
+                                    </control>
+                                    <control type="label">
+                                        <posx>0</posx>
+                                        <posy>0</posy>
+                                        <width>300</width>
+                                        <height>66</height>
+                                        <font>font12</font>
+                                        <align>center</align>
+                                        <aligny>center</aligny>
+                                        <textcolor>FF000000</textcolor>
+                                        <label>$INFO[ListItem.Label]</label>
+                                    </control>
+                                </focusedlayout>
+                            </control>
+                        </control>
+                    </control>
+
                     <control type="button" id="201">
                         <width max="500">auto</width>
                         <height>66</height>
@@ -8024,7 +8208,7 @@
                                 <height>900</height>
                                 <onup>201</onup>
                                 <ondown>noop</ondown>
-                                <onleft>203</onleft>
+                                <onleft>205</onleft>
                                 <onright>202</onright>
                                 <onunfocus>SetProperty(show.servers,)</onunfocus>
                                 <scrolltime>200</scrolltime>

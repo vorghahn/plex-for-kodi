@@ -85,6 +85,7 @@ class BoolSetting(BasicSetting):
     type = 'BOOL'
 
 
+
 class OptionsSetting(BasicSetting):
     type = 'OPTIONS'
 
@@ -119,6 +120,11 @@ class InfoSetting(BasicSetting):
     def valueLabel(self):
         return self.info
 
+class TextSetting(BasicSetting):
+    type = 'TEXT'
+
+class HiddenTextSetting(TextSetting):
+    type = 'TEXT'
 
 class PlatformSetting(InfoSetting):
     def __init__(self):
@@ -190,6 +196,7 @@ class Settings(object):
                         "If enabled, when playback ends and there is a 'Next Up' item available, it will be automatically be played after a 15 second delay."
                     )
                 ),
+                BoolSetting('live_tv', T(32060, 'Live TV'), True)
             )
         ),
         'audio': (
@@ -246,6 +253,22 @@ class Settings(object):
             T(32051, 'Privacy'),
             ()
         ),
+        'livetv': (
+            T(32061, 'Live TV Setup'), (
+                BoolSetting('tvh', T(32064, 'Enable TVHeadend'), True),
+                IPSetting('tvh_ip', T(32044, 'Connection 1 IP'), ''),
+                IntegerSetting('tvh_port', T(32045, 'Connection 1 Port'), 9981),
+                IntegerSetting('tvh_port_1', T(32045, 'Connection 1 Port'), 9982),
+                TextSetting('uname', T(32062, 'Username'), '').description('tvh username'),
+                TextSetting('pword', T(32063, 'Password'), '').description('tvh username'),
+                BoolSetting('sstv', 'Enable SSTV', True),
+                TextSetting('uname_sstv',  'SSTV Username', '').description('sstv username'),
+                TextSetting('pword_sstv',  'SSTV Password', '').description('sstv password'),
+                TextSetting('server_sstv', "SSTV Regional Server", '').description('eg dap'),
+                TextSetting('service_sstv', "SSTV Provider", '').description('eg viewstvn'),
+                IntegerSetting('sstv_quality', 'SSTV Quality', int(1)).description('enter one of 1,2,3'),
+            )
+        ),
         'about': (
             T(32052, 'About'), (
                 InfoSetting('addon_version', T(32054, 'Addon Version'), util.ADDON.getAddonInfo('version')),
@@ -257,7 +280,7 @@ class Settings(object):
         ),
     }
 
-    SECTION_IDS = ('main', 'video', 'subtitles', 'advanced', 'manual', 'about')
+    SECTION_IDS = ('main', 'video', 'subtitles', 'advanced', 'manual', 'livetv', 'about')
 
     def __getitem__(self, key):
         return self.SETTINGS[key]
@@ -355,6 +378,8 @@ class SettingsWindow(kodigui.BaseWindow, windowutils.UtilMixin):
             if setting.type == 'BOOL':
                 item.setProperty('checkbox', '1')
                 item.setProperty('checkbox.checked', setting.get() and '1' or '')
+            elif setting.type == 'HIDDEN':
+                setting.type == 'TEXT'
 
             items.append(item)
 
@@ -376,6 +401,8 @@ class SettingsWindow(kodigui.BaseWindow, windowutils.UtilMixin):
             self.editIP(mli, setting)
         elif setting.type == 'INTEGER' and not from_right:
             self.editInteger(mli, setting)
+        elif setting.type == 'TEXT' and not from_right:
+            self.editText(mli, setting)
 
     def changeSetting(self):
         optionItem = self.optionsList.getSelectedItem()
@@ -443,6 +470,12 @@ class SettingsWindow(kodigui.BaseWindow, windowutils.UtilMixin):
         setting.set(int(result))
         mli.setLabel2(result)
 
+    def editText(self, mli, setting):
+        result = xbmcgui.Dialog().input(T(32062, 'Username'), str(setting.get()))
+        if not result:
+            return
+        setting.set(str(result))
+        mli.setLabel2(result)
 
 class SelectDialog(kodigui.BaseDialog, util.CronReceiver):
     xmlFile = 'script-plex-settings_select_dialog.xml'
