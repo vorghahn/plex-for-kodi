@@ -2,7 +2,7 @@
 <addon id="script.plex"
        name="Plex"
        version="0.1.2"
-       provider-name="Plex">
+       provider-name="Vorghahn">
     <requires>
         <import addon="xbmc.python" version="2.24.0"/>
         <import addon="script.module.requests" version="2.3.0"/>
@@ -25,7 +25,7 @@
         <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
         <forum>https://forums.plex.tv/categories/plex-for-kodi</forum>
         <website>https://www.plex.tv</website>
-        <source>https://github.com/plexinc/plex-for-kodi</source>
+        <source>https://github.com/vorghahn/plex-for-kodi</source>
         <platform>all</platform>
     </extension>
 </addon>
